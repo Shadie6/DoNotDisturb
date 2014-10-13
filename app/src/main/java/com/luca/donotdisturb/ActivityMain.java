@@ -1,17 +1,60 @@
 package com.luca.donotdisturb;
 
 import android.app.Activity;
+import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class ActivityMain extends Activity {
+
+    private TextView led;
+    private TextView profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_main);
+
+        led = (TextView) findViewById(R.id.led);
+        profile = (TextView) findViewById(R.id.profile);
+
+        int ledStatus = 0;
+        int profileStatus = 0;
+
+        try {
+            ledStatus = Settings.System.getInt(getContentResolver(), "notification_ligth_pulse");
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        final AudioManager mobileMode = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        profileStatus = mobileMode.getMode();
+
+        if (ledStatus == 0){
+            led.setText("Led disabilitato");
+        } else {
+            led.setText("Led abilitato");
+        }
+
+        switch (profileStatus){
+            case AudioManager.RINGER_MODE_NORMAL:
+                profile.setText("Modalità NORMALE attiva");
+                break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                profile.setText("Modalità VIBRAZIONE attiva");
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                profile.setText("Modalità SILENZIOSA attiva");
+                break;
+            default:
+                profile.setText("Contesto non conosciuto");
+                break;
+        }
     }
 
 
